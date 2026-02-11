@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Healthy Food Awareness</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+
+    <header class="hero">
+        <div class="container">
+            <h1>Healthy Food Awareness</h1>
+            <p>Discover your daily calorie needs and how to fuel your body with nature's best!</p>
+        </div>
+    </header>
+
+    <main class="container">
+
+        <!-- Food Gallery Section (Awareness First) -->
+        <section id="food-gallery">
+            <h2>Fuel Your Day</h2>
+            <p>Here is how you can earn your calories with healthy choices!</p>
+
+            <div class="tabs">
+                <button class="tab-btn active" data-category="all">All</button>
+                <button class="tab-btn" data-category="vegetable">Vegetables</button>
+                <button class="tab-btn" data-category="fruit">Fruits</button>
+                <button class="tab-btn" data-category="meat">Proteins</button>
+            </div>
+
+            <div class="food-grid" id="food-grid">
+                <!-- Food items will be injected here by JS -->
+            </div>
+        </section>
+
+        <!-- Calculator Section -->
+        <section id="calculator" class="card" style="margin-top: 50px;">
+            <h2>Calculate Your Daily Needs</h2>
+            <div class="form-group">
+                <label for="age">Age</label>
+                <input type="number" id="age" placeholder="Enter your age" min="1" max="120">
+            </div>
+            <div class="form-group">
+                <label>Gender</label>
+                <div class="gender-options">
+                    <label class="radio-label">
+                        <input type="radio" name="gender" value="male" checked> Male
+                    </label>
+                    <label class="radio-label">
+                        <input type="radio" name="gender" value="female"> Female
+                    </label>
+                </div>
+            </div>
+            <button id="calculate-btn">Get My Plan</button>
+            <div id="result-message" class="hidden"></div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 Healthy Food Awareness. Eat Smart, Live Strong.</p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
