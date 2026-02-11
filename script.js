@@ -89,28 +89,107 @@ document.addEventListener('DOMContentLoaded', () => {
     const calculateBtn = document.getElementById('calculate-btn');
     const ageInput = document.getElementById('age');
     const resultMessage = document.getElementById('result-message');
-    const foodGallery = document.getElementById('food-gallery');
     const foodGrid = document.getElementById('food-grid');
     const tabBtns = document.querySelectorAll('.tab-btn');
 
-    // --- Event Listeners ---
-    calculateBtn.addEventListener('click', handleCalculation);
+    // Navigation & Animation Elements
+    const nextBtns = document.querySelectorAll('.next-btn');
+    const backBtns = document.querySelectorAll('.back-btn');
+    const sections = document.querySelectorAll('.step-section');
+    const calcNextBtn = document.getElementById('btn-to-food'); // specific reference
+
+    const header = document.getElementById('main-header');
+    const mainContent = document.getElementById('main-content');
+    const dynamicWord = document.getElementById('dynamic-word');
+    const words = ["Strength", "Focus", "Healthy Body"];
+
+    // --- Init & Animation ---
 
     // Initial Render
     renderFoodGrid('all');
 
+    // Start Intro Animation
+    playIntro();
+
+    function playIntro() {
+        let index = 0;
+
+        const interval = setInterval(() => {
+            // Animate out
+            dynamicWord.classList.add('fade-out');
+
+            setTimeout(() => {
+                // Change word
+                index++;
+                if (index < words.length) {
+                    dynamicWord.innerText = words[index];
+                    dynamicWord.classList.remove('fade-out');
+                    dynamicWord.classList.add('scale-up');
+                    setTimeout(() => dynamicWord.classList.remove('scale-up'), 200);
+                } else {
+                    // Animation Complete
+                    clearInterval(interval);
+                    finishIntro();
+                }
+            }, 300); // wait for fade out
+
+        }, 1200); // Time per word
+    }
+
+    function finishIntro() {
+        // Transition header to normal
+        header.classList.remove('full-screen');
+
+        // Final word state
+        dynamicWord.innerText = words[words.length - 1]; // Ensure last word is set
+        dynamicWord.classList.remove('fade-out');
+
+        // Show Content after header transition
+        setTimeout(() => {
+            mainContent.classList.remove('hidden-content');
+            mainContent.classList.add('visible');
+        }, 1000); // Matches CSS transition time
+    }
+
+    // --- Event Listeners ---
+    calculateBtn.addEventListener('click', handleCalculation);
+
+    // Tab Filters
     tabBtns.forEach(btn => {
         btn.addEventListener('click', () => {
-            // Remove active class from all
             tabBtns.forEach(b => b.classList.remove('active'));
-            // Add active to clicked
             btn.classList.add('active');
-            // Filter
             renderFoodGrid(btn.dataset.category);
         });
     });
 
+    // Navigation Logic
+    nextBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const nextId = btn.dataset.next;
+            showSection(nextId);
+        });
+    });
+
+    backBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const backId = btn.dataset.back;
+            showSection(backId);
+        });
+    });
+
     // --- Functions ---
+
+    function showSection(sectionId) {
+        sections.forEach(sec => {
+            sec.classList.remove('active');
+            // Optional: reset scroll to top
+            if (sec.id === sectionId) {
+                sec.classList.add('active');
+                window.scrollTo(0, 0);
+            }
+        });
+    }
 
     function handleCalculation() {
         const age = parseInt(ageInput.value);
@@ -126,13 +205,13 @@ document.addEventListener('DOMContentLoaded', () => {
         resultMessage.style.display = 'block';
         resultMessage.innerHTML = `Based on your age (${age}) and gender (${gender}), your estimated daily requirement is <strong>${calories} kcal</strong>.`;
         resultMessage.classList.remove('hidden');
+
+        // Show navigation to next step
+        calcNextBtn.classList.remove('hidden');
     }
 
     function calculateDailyCalories(age, gender) {
         // Simplified estimate based on average needs
-        // Real formulas (Mifflin-St Jeor) usually require weight custom height.
-        // We will use age-based averages for this awareness tool.
-
         let base = 2000;
 
         if (gender === 'male') {

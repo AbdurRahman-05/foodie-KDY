@@ -4,26 +4,99 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Healthy Food Awareness</title>
+    <title>Foodie KDY</title>
     <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&family=Chewy&display=swap"
+        rel="stylesheet">
 </head>
 
 <body>
 
-    <header class="hero">
+    <header class="hero full-screen" id="main-header">
         <div class="container">
-            <h1>Healthy Food Awareness</h1>
-            <p>Discover your daily calorie needs and how to fuel your body with nature's best!</p>
+            <h1 class="logo-text">Foodie KDY</h1>
+            <p class="slogan">Healthy food gives <span id="dynamic-word" class="word-anim">Strength</span></p>
         </div>
     </header>
 
-    <main class="container">
 
-        <!-- Food Gallery Section (Awareness First) -->
-        <section id="food-gallery">
-            <h2>Fuel Your Day</h2>
-            <p>Here is how you can earn your calories with healthy choices!</p>
+    <main class="container hidden-content" id="main-content">
+
+        <!-- Step 1: Awareness Section -->
+        <section id="step-awareness" class="step-section active">
+            <div class="awareness-content">
+                <h2>Why Clean Eating Matters</h2>
+                <div class="info-grid">
+                    <div class="info-card">
+                        <img src="https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/svg/1f4aa.svg" alt="Strength"
+                            class="info-icon">
+                        <h3>Strength & Energy</h3>
+                        <p>Fuel your body with the right nutrients to stay active and strong throughout the day.</p>
+                    </div>
+                    <div class="info-card">
+                        <img src="https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/svg/1f9e0.svg" alt="Focus"
+                            class="info-icon">
+                        <h3>Sharp Focus</h3>
+                        <p>Balanced meals improve concentration and brain function.</p>
+                    </div>
+                    <div class="info-card">
+                        <img src="https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/svg/2764.svg" alt="Health"
+                            class="info-icon">
+                        <h3>Long-term Health</h3>
+                        <p>Prevent chronic diseases and boost your immune system with natural foods.</p>
+                    </div>
+                </div>
+                <div class="video-container">
+                    <iframe width="560" height="315" src="https://www.youtube.com/embed/RE5tvaveVak"
+                        title="Healthy Food Awareness Video" frameborder="0"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowfullscreen></iframe>
+                </div>
+
+                <div class="action-area">
+                    <p class="cta-text">Ready to find out what your body needs?</p>
+                    <button class="nav-btn next-btn" data-next="step-calculator">Start My Journey</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Step 2: Calculator Section -->
+        <section id="step-calculator" class="step-section hidden-step">
+            <div class="card calculator-card">
+                <h2>Step 2: Calculate Your Daily Needs</h2>
+                <p>Let's find out how many calories you need to maintain your energy.</p>
+                <div class="form-group">
+                    <label for="age">Age</label>
+                    <input type="number" id="age" placeholder="Enter your age" min="1" max="120">
+                </div>
+                <div class="form-group">
+                    <label>Gender</label>
+                    <div class="gender-options">
+                        <label class="radio-label">
+                            <input type="radio" name="gender" value="male" checked> Male
+                        </label>
+                        <label class="radio-label">
+                            <input type="radio" name="gender" value="female"> Female
+                        </label>
+                    </div>
+                </div>
+                <button id="calculate-btn" class="action-btn">Calculate</button>
+                <div id="result-message" class="hidden"></div>
+
+                <div class="nav-actions">
+                    <button class="nav-btn back-btn" data-back="step-awareness">Back</button>
+                    <button class="nav-btn next-btn hidden" id="btn-to-food" data-next="step-food">See Recommended
+                        Foods</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Step 3: Food Gallery Section -->
+        <section id="step-food" class="step-section hidden-step">
+            <div class="gallery-header">
+                <h2>Your Fuel Sources</h2>
+                <p>Here is how you can earn your calories with healthy choices!</p>
+            </div>
 
             <div class="tabs">
                 <button class="tab-btn active" data-category="all">All</button>
@@ -35,29 +108,13 @@
             <div class="food-grid" id="food-grid">
                 <!-- Food items will be injected here by JS -->
             </div>
+
+            <div class="nav-actions" style="margin-top: 30px;">
+                <button class="nav-btn back-btn" data-back="step-calculator">Back to Calculator</button>
+                <button class="nav-btn home-btn" onclick="location.reload()">Start Over</button>
+            </div>
         </section>
 
-        <!-- Calculator Section -->
-        <section id="calculator" class="card" style="margin-top: 50px;">
-            <h2>Calculate Your Daily Needs</h2>
-            <div class="form-group">
-                <label for="age">Age</label>
-                <input type="number" id="age" placeholder="Enter your age" min="1" max="120">
-            </div>
-            <div class="form-group">
-                <label>Gender</label>
-                <div class="gender-options">
-                    <label class="radio-label">
-                        <input type="radio" name="gender" value="male" checked> Male
-                    </label>
-                    <label class="radio-label">
-                        <input type="radio" name="gender" value="female"> Female
-                    </label>
-                </div>
-            </div>
-            <button id="calculate-btn">Get My Plan</button>
-            <div id="result-message" class="hidden"></div>
-        </section>
     </main>
 
     <footer>
