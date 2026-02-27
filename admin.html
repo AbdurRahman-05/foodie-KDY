@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Foodie KDY — Admin Panel</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Chewy&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="admin.css">
+</head>
+
+<body>
+    <!-- Login Overlay -->
+    <div class="login-overlay" id="login-overlay">
+        <div class="login-card">
+            <div class="login-logo">🔐</div>
+            <h1>Admin Panel</h1>
+            <p class="login-subtitle">Enter your credentials to manage Foodie KDY</p>
+            <div class="login-form">
+                <div class="input-group">
+                    <label for="login-username">Username</label>
+                    <input type="text" id="login-username" placeholder="Enter username" autocomplete="off">
+                </div>
+                <div class="input-group">
+                    <label for="login-password">Password</label>
+                    <input type="password" id="login-password" placeholder="Enter password">
+                </div>
+                <p class="login-error" id="login-error"></p>
+                <button id="login-btn" class="btn btn-primary btn-full">Login</button>
+                <p class="login-hint">Default: admin / admin123</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Dashboard -->
+    <div class="admin-dashboard hidden" id="admin-dashboard">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <span class="sidebar-logo">🍽️</span>
+                <h2>Foodie KDY</h2>
+                <span class="sidebar-badge">Admin</span>
+            </div>
+            <nav class="sidebar-nav">
+                <button class="nav-item active" data-section="site-settings">
+                    <span class="nav-icon">⚙️</span> Site Settings
+                </button>
+                <button class="nav-item" data-section="awareness-section">
+                    <span class="nav-icon">📢</span> Awareness Cards
+                </button>
+                <button class="nav-item" data-section="food-manager">
+                    <span class="nav-icon">🥗</span> Food Items
+                </button>
+                <button class="nav-item" data-section="calorie-settings">
+                    <span class="nav-icon">🔥</span> Calorie Settings
+                </button>
+            </nav>
+            <div class="sidebar-footer">
+                <a href="index.html" class="btn btn-outline btn-sm">← View Site</a>
+                <button id="logout-btn" class="btn btn-danger btn-sm">Logout</button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="topbar">
+                <button class="menu-toggle" id="menu-toggle">☰</button>
+                <h1 class="page-title" id="page-title">Site Settings</h1>
+                <div class="topbar-actions">
+                    <span class="db-status"><span class="db-dot" id="db-status-dot"></span> <span
+                            id="db-status-label">Checking...</span></span>
+                    <button id="reset-all-btn" class="btn btn-outline btn-sm">🔄 Reset All</button>
+                </div>
+            </header>
+
+            <div class="content-area">
+
+                <!-- Section: Site Settings -->
+                <section class="admin-section active" id="sec-site-settings">
+                    <div class="section-card">
+                        <h3>🏠 Hero Section</h3>
+                        <p class="section-desc">Edit the main branding that appears at the top of the site.</p>
+                        <div class="form-grid">
+                            <div class="input-group">
+                                <label for="site-title">Site Title</label>
+                                <input type="text" id="site-title" placeholder="Foodie KDY">
+                            </div>
+                            <div class="input-group">
+                                <label for="site-slogan-prefix">Slogan Prefix</label>
+                                <input type="text" id="site-slogan-prefix" placeholder="Healthy food gives">
+                            </div>
+                        </div>
+                        <div class="input-group">
+                            <label for="site-slogan-words">Animated Words (comma separated)</label>
+                            <input type="text" id="site-slogan-words" placeholder="Strength, Focus, Healthy Body">
+                        </div>
+                    </div>
+
+                    <div class="section-card">
+                        <h3>📺 Video Section</h3>
+                        <p class="section-desc">Change the YouTube awareness video link.</p>
+                        <div class="input-group">
+                            <label for="video-url">YouTube Embed URL</label>
+                            <input type="text" id="video-url" placeholder="https://www.youtube.com/embed/RE5tvaveVak">
+                        </div>
+                    </div>
+
+                    <div class="section-card">
+                        <h3>🔗 Footer</h3>
+                        <div class="input-group">
+                            <label for="footer-text">Footer Text</label>
+                            <input type="text" id="footer-text"
+                                placeholder="© 2026 Healthy Food Awareness. Eat Smart, Live Strong.">
+                        </div>
+                    </div>
+
+                    <button class="btn btn-primary btn-save" id="save-site-settings">💾 Save Site Settings</button>
+                </section>
+
+                <!-- Section: Awareness Cards -->
+                <section class="admin-section" id="sec-awareness-section">
+                    <div class="section-card">
+                        <h3>📢 Awareness Section</h3>
+                        <p class="section-desc">Edit the awareness heading and the three info cards.</p>
+                        <div class="input-group">
+                            <label for="awareness-heading">Section Heading</label>
+                            <input type="text" id="awareness-heading" placeholder="Why Clean Eating Matters">
+                        </div>
+                        <div class="input-group">
+                            <label for="awareness-cta">Call-to-Action Text</label>
+                            <input type="text" id="awareness-cta" placeholder="Ready to find out what your body needs?">
+                        </div>
+                    </div>
+
+                    <div id="awareness-cards-container">
+                        <!-- Cards rendered by JS -->
+                    </div>
+                    <button class="btn btn-primary btn-save" id="save-awareness">💾 Save Awareness Cards</button>
+                </section>
+
+                <!-- Section: Food Manager -->
+                <section class="admin-section" id="sec-food-manager">
+                    <div class="section-card">
+                        <h3>🥗 Manage Food Items</h3>
+                        <p class="section-desc">Add, edit, or delete food items shown in the gallery. Supports
+                            vegetables, fruits, and protein/meat items.</p>
+                    </div>
+
+                    <div class="toolbar">
+                        <button class="btn btn-primary" id="add-food-btn">➕ Add New Food</button>
+                        <div class="filter-group">
+                            <button class="filter-btn active" data-filter="all">All</button>
+                            <button class="filter-btn" data-filter="vegetable">🥬 Vegetables</button>
+                            <button class="filter-btn" data-filter="fruit">🍎 Fruits</button>
+                            <button class="filter-btn" data-filter="meat">🍗 Proteins</button>
+                        </div>
+                    </div>
+
+                    <div id="food-list" class="food-list">
+                        <!-- Food items rendered by JS -->
+                    </div>
+
+                    <!-- Add/Edit Food Modal -->
+                    <div class="modal-overlay hidden" id="food-modal">
+                        <div class="modal">
+                            <div class="modal-header">
+                                <h3 id="modal-title">Add New Food</h3>
+                                <button class="modal-close" id="modal-close">✕</button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="form-grid">
+                                    <div class="input-group">
+                                        <label for="food-name">Name</label>
+                                        <input type="text" id="food-name" placeholder="e.g. Avocado">
+                                    </div>
+                                    <div class="input-group">
+                                        <label for="food-type">Category</label>
+                                        <select id="food-type">
+                                            <option value="vegetable">Vegetable</option>
+                                            <option value="fruit">Fruit</option>
+                                            <option value="meat">Protein / Meat</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-grid">
+                                    <div class="input-group">
+                                        <label for="food-calories">Calories</label>
+                                        <input type="number" id="food-calories" placeholder="e.g. 160">
+                                    </div>
+                                    <div class="input-group">
+                                        <label for="food-unit">Unit</label>
+                                        <input type="text" id="food-unit" placeholder="e.g. 100g or 1 medium">
+                                    </div>
+                                </div>
+                                <div class="input-group">
+                                    <label for="food-desc">Description</label>
+                                    <textarea id="food-desc" rows="3"
+                                        placeholder="A short description of this food..."></textarea>
+                                </div>
+                                <div class="input-group">
+                                    <label for="food-image">Image URL (emoji SVG or image link)</label>
+                                    <input type="text" id="food-image"
+                                        placeholder="https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/svg/1f951.svg">
+                                    <p class="input-hint">Browse emojis at <a
+                                            href="https://twemoji-cheatsheet.vercel.app/" target="_blank">Twemoji
+                                            Cheatsheet</a></p>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button class="btn btn-outline" id="modal-cancel">Cancel</button>
+                                <button class="btn btn-primary" id="modal-save">💾 Save Food</button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Section: Calorie Settings -->
+                <section class="admin-section" id="sec-calorie-settings">
+                    <div class="section-card">
+                        <h3>🔥 Daily Calorie Calculator Settings</h3>
+                        <p class="section-desc">Customize the calorie recommendation values by age group and gender.</p>
+                    </div>
+
+                    <div class="calorie-grid">
+                        <div class="section-card">
+                            <h4>👨 Male</h4>
+                            <div class="form-grid">
+                                <div class="input-group">
+                                    <label for="cal-male-teen">Under 18 (Teen)</label>
+                                    <input type="number" id="cal-male-teen" placeholder="2400">
+                                </div>
+                                <div class="input-group">
+                                    <label for="cal-male-young">18–29 (Young Adult)</label>
+                                    <input type="number" id="cal-male-young" placeholder="2600">
+                                </div>
+                                <div class="input-group">
+                                    <label for="cal-male-adult">30–49 (Adult)</label>
+                                    <input type="number" id="cal-male-adult" placeholder="2400">
+                                </div>
+                                <div class="input-group">
+                                    <label for="cal-male-older">50+ (Older Adult)</label>
+                                    <input type="number" id="cal-male-older" placeholder="2200">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="section-card">
+                            <h4>👩 Female</h4>
+                            <div class="form-grid">
+                                <div class="input-group">
+                                    <label for="cal-female-teen">Under 18 (Teen)</label>
+                                    <input type="number" id="cal-female-teen" placeholder="2000">
+                                </div>
+                                <div class="input-group">
+                                    <label for="cal-female-young">18–29 (Young Adult)</label>
+                                    <input type="number" id="cal-female-young" placeholder="2200">
+                                </div>
+                                <div class="input-group">
+                                    <label for="cal-female-adult">30–49 (Adult)</label>
+                                    <input type="number" id="cal-female-adult" placeholder="2000">
+                                </div>
+                                <div class="input-group">
+                                    <label for="cal-female-older">50+ (Older Adult)</label>
+                                    <input type="number" id="cal-female-older" placeholder="1800">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button class="btn btn-primary btn-save" id="save-calorie-settings">💾 Save Calorie
+                        Settings</button>
+                </section>
+
+            </div>
+        </main>
+    </div>
+
+    <div class="toast hidden" id="toast">Saved successfully!</div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+    <script src="firebase-config.js"></script>
+
+    <script src="admin.js"></script>
+</body>
+
+</html>
