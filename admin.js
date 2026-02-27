@@ -34,7 +34,7 @@
             male: { teen: 2400, young: 2600, adult: 2400, older: 2200 },
             female: { teen: 2000, young: 2200, adult: 2000, older: 1800 }
         },
-        adminCredentials: { username: 'admin', password: 'admin123' }
+        adminCredentials: { username: 'admin@foodiekdy', password: 'foodiekdy@3' }
     };
 
     // =============== STORAGE ===============
