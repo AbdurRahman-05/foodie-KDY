@@ -467,3 +467,516 @@ footer {
     max-width: 600px;
     margin: 0 auto;
 }
+
+/* ========================================
+   MEAL PLANNER
+   ======================================== */
+.calorie-target-bar {
+    background: var(--white);
+    border-radius: 12px;
+    padding: 20px;
+    margin: 20px 0;
+    border: 2px solid #ede7f6;
+}
+
+.target-info {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 12px;
+    font-size: 0.9rem;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.target-info strong {
+    color: var(--primary-color);
+}
+
+.progress-track {
+    height: 18px;
+    background: #ede7f6;
+    border-radius: 20px;
+    overflow: hidden;
+    position: relative;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--primary-color), var(--primary-light));
+    border-radius: 20px;
+    width: 0%;
+    transition: width 0.5s ease, background 0.3s;
+    min-width: 0;
+}
+
+.progress-fill.over {
+    background: linear-gradient(90deg, #ef5350, #e53935);
+}
+
+.mp-category-tabs {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin: 20px 0 16px;
+    flex-wrap: wrap;
+}
+
+.mp-tab {
+    padding: 8px 16px;
+    border: 2px solid var(--primary-color);
+    background: transparent;
+    color: var(--primary-color);
+    border-radius: 20px;
+    font-family: 'Nunito', sans-serif;
+    font-weight: bold;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.mp-tab.active,
+.mp-tab:hover {
+    background: var(--primary-color);
+    color: white;
+}
+
+.mp-food-selector {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+}
+
+.mp-food-chip {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--white);
+    border: 2px solid #ede7f6;
+    border-radius: 30px;
+    padding: 8px 16px 8px 8px;
+    cursor: pointer;
+    transition: all 0.25s;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 600;
+    font-size: 0.88rem;
+}
+
+.mp-food-chip:hover {
+    border-color: var(--primary-light);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(106, 27, 154, 0.12);
+}
+
+.mp-food-chip img {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    object-fit: contain;
+    background: #fafafa;
+}
+
+.mp-food-chip .chip-cal {
+    font-size: 0.72rem;
+    color: #999;
+    margin-left: 2px;
+}
+
+/* Plate Items */
+.mp-plate {
+    min-height: 60px;
+    margin-top: 12px;
+}
+
+.mp-empty {
+    text-align: center;
+    color: #999;
+    font-style: italic;
+    padding: 20px;
+}
+
+.mp-plate-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: var(--white);
+    border: 2px solid #ede7f6;
+    border-radius: 14px;
+    padding: 12px 16px;
+    margin-bottom: 10px;
+    transition: all 0.25s;
+}
+
+.mp-plate-item:hover {
+    border-color: var(--primary-light);
+}
+
+.mp-plate-item img {
+    width: 40px;
+    height: 40px;
+    object-fit: contain;
+}
+
+.mp-plate-item .plate-name {
+    flex: 1;
+    font-weight: 700;
+    color: var(--primary-dark);
+}
+
+.mp-plate-item .plate-qty {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.mp-plate-item .plate-qty input {
+    width: 70px;
+    padding: 6px 8px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    text-align: center;
+    font-family: 'Nunito', sans-serif;
+}
+
+.mp-plate-item .plate-qty input:focus {
+    border-color: var(--primary-color);
+    outline: none;
+}
+
+.mp-plate-item .plate-qty span {
+    font-size: 0.8rem;
+    color: #888;
+}
+
+.mp-plate-item .plate-kcal {
+    font-weight: 800;
+    color: var(--primary-color);
+    min-width: 70px;
+    text-align: right;
+    font-size: 0.95rem;
+}
+
+.mp-plate-item .plate-remove {
+    background: none;
+    border: none;
+    font-size: 1.1rem;
+    cursor: pointer;
+    color: #ccc;
+    transition: color 0.2s;
+    padding: 4px;
+}
+
+.mp-plate-item .plate-remove:hover {
+    color: #ef5350;
+}
+
+/* Suggestion Box */
+.mp-suggestion {
+    margin-top: 20px;
+    background: #fdf2e9;
+    border-radius: 12px;
+    padding: 16px 20px;
+    font-size: 0.9rem;
+    color: var(--primary-dark);
+    border-left: 4px solid var(--secondary-color);
+}
+
+.mp-suggestion strong {
+    color: var(--primary-color);
+}
+
+@media (max-width: 600px) {
+    .mp-plate-item {
+        flex-wrap: wrap;
+    }
+
+    .mp-plate-item .plate-kcal {
+        text-align: left;
+    }
+
+    .target-info {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .meal-split-grid {
+        grid-template-columns: 1fr !important;
+    }
+
+    .auto-fill-btns {
+        flex-direction: column;
+    }
+}
+
+/* ========================================
+   AUTO-FILL PRESETS
+   ======================================== */
+.auto-fill-section {
+    margin: 24px 0;
+    padding: 20px;
+    background: #f3e5f5;
+    border-radius: 14px;
+    text-align: center;
+}
+
+.auto-fill-section h3 {
+    color: var(--primary-color);
+    margin-bottom: 4px;
+}
+
+.section-hint {
+    font-size: 0.85rem;
+    color: #888;
+    margin-bottom: 14px;
+}
+
+.auto-fill-btns {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.auto-btn {
+    padding: 10px 20px;
+    border: 2px solid transparent;
+    border-radius: 25px;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 700;
+    font-size: 0.88rem;
+    cursor: pointer;
+    transition: all 0.3s;
+    color: white;
+}
+
+.auto-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+}
+
+.veg-btn {
+    background: linear-gradient(135deg, #43a047, #66bb6a);
+}
+
+.fruit-btn {
+    background: linear-gradient(135deg, #ef6c00, #ffa726);
+}
+
+.protein-btn {
+    background: linear-gradient(135deg, #c62828, #ef5350);
+}
+
+.mix-btn {
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+}
+
+.clear-btn {
+    background: #999;
+}
+
+/* ========================================
+   MEAL SPLIT (Breakfast / Lunch / Dinner)
+   ======================================== */
+.meal-split-section {
+    margin: 24px 0;
+    text-align: center;
+}
+
+.meal-split-section h3 {
+    color: var(--primary-color);
+    margin-bottom: 4px;
+}
+
+.meal-split-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 16px;
+    margin-top: 10px;
+}
+
+.meal-card {
+    background: var(--white);
+    border-radius: 16px;
+    padding: 20px 16px;
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.06);
+    border-top: 4px solid #ddd;
+    transition: transform 0.3s;
+}
+
+.meal-card:hover {
+    transform: translateY(-4px);
+}
+
+.meal-card.breakfast {
+    border-top-color: #ffa726;
+}
+
+.meal-card.lunch {
+    border-top-color: #42a5f5;
+}
+
+.meal-card.dinner {
+    border-top-color: #7e57c2;
+}
+
+.meal-icon {
+    font-size: 2rem;
+    margin-bottom: 6px;
+}
+
+.meal-card h4 {
+    color: var(--primary-dark);
+    margin-bottom: 4px;
+    font-size: 1rem;
+}
+
+.meal-pct {
+    font-size: 0.8rem;
+    color: #999;
+    margin-bottom: 6px;
+}
+
+.meal-kcal {
+    font-size: 1.3rem;
+    font-weight: 800;
+    color: var(--primary-color);
+    margin-bottom: 10px;
+}
+
+.meal-foods {
+    text-align: left;
+    font-size: 0.82rem;
+    color: #666;
+    line-height: 1.7;
+}
+
+.meal-foods .meal-food-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 3px 0;
+    border-bottom: 1px dashed #eee;
+}
+
+.meal-foods .meal-food-item:last-child {
+    border-bottom: none;
+}
+
+/* ========================================
+   FOOD CHIP + BUTTON
+   ======================================== */
+.mp-food-chip .chip-add {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: var(--primary-color);
+    color: white;
+    font-size: 1rem;
+    font-weight: 800;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s;
+    flex-shrink: 0;
+    line-height: 1;
+}
+
+.mp-food-chip .chip-add:hover {
+    background: var(--primary-light);
+    transform: scale(1.15);
+}
+
+/* ========================================
+   MEAL REMINDERS
+   ======================================== */
+.reminder-section {
+    margin: 30px 0 10px;
+    padding: 24px;
+    background: linear-gradient(135deg, #ede7f6 0%, #fce4ec 100%);
+    border-radius: 16px;
+    text-align: center;
+}
+
+.reminder-section h3 {
+    color: var(--primary-color);
+    margin-bottom: 4px;
+}
+
+.reminder-grid {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    margin: 16px 0;
+    flex-wrap: wrap;
+}
+
+.reminder-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--white);
+    padding: 10px 16px;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.reminder-label {
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: var(--primary-dark);
+}
+
+.reminder-time {
+    padding: 8px 12px;
+    border: 2px solid #ddd;
+    border-radius: 10px;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: var(--primary-dark);
+    cursor: pointer;
+}
+
+.reminder-time:focus {
+    border-color: var(--primary-color);
+    outline: none;
+}
+
+.btn-remind {
+    padding: 12px 30px;
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+    color: white;
+    border: none;
+    border-radius: 25px;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 700;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.3s;
+    margin-top: 6px;
+}
+
+.btn-remind:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(106, 27, 154, 0.3);
+}
+
+.btn-remind.active {
+    background: linear-gradient(135deg, #43a047, #66bb6a);
+}
+
+.reminder-status {
+    margin-top: 10px;
+    font-size: 0.85rem;
+    color: var(--primary-dark);
+    min-height: 20px;
+}
+
+@media (max-width: 600px) {
+    .reminder-grid {
+        flex-direction: column;
+        align-items: center;
+    }
+}

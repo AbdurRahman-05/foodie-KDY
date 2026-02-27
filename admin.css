@@ -794,6 +794,62 @@ body {
 }
 
 /* ============================================
+   IMAGE UPLOAD
+   ============================================ */
+.image-upload-area {
+    border: 2px dashed var(--admin-border);
+    border-radius: 12px;
+    padding: 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s;
+    position: relative;
+    min-height: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.image-upload-area:hover {
+    border-color: var(--admin-primary-light);
+    background: rgba(156, 77, 204, 0.05);
+}
+
+.image-upload-area.dragover {
+    border-color: var(--admin-accent);
+    background: rgba(255, 193, 7, 0.08);
+}
+
+.upload-placeholder {
+    color: var(--admin-text-muted);
+}
+
+.upload-placeholder span {
+    font-size: 2rem;
+    display: block;
+    margin-bottom: 6px;
+}
+
+.upload-placeholder p {
+    font-size: 0.82rem;
+}
+
+.file-input-hidden {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.image-preview {
+    max-width: 100px;
+    max-height: 100px;
+    object-fit: contain;
+    border-radius: 10px;
+}
+
+/* ============================================
    UTILITY
    ============================================ */
 .hidden {

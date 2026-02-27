@@ -199,12 +199,20 @@
                                         placeholder="A short description of this food..."></textarea>
                                 </div>
                                 <div class="input-group">
-                                    <label for="food-image">Image URL (emoji SVG or image link)</label>
+                                    <label>Food Image</label>
+                                    <div class="image-upload-area" id="image-upload-area">
+                                        <img id="image-preview" class="image-preview hidden" src="" alt="Preview">
+                                        <div class="upload-placeholder" id="upload-placeholder">
+                                            <span>📷</span>
+                                            <p>Click to upload or drag an image</p>
+                                        </div>
+                                        <input type="file" id="food-image-file" accept="image/*"
+                                            class="file-input-hidden">
+                                    </div>
+                                    <p class="input-hint" style="margin-top:8px;">Or paste an image URL below:</p>
                                     <input type="text" id="food-image"
-                                        placeholder="https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/svg/1f951.svg">
-                                    <p class="input-hint">Browse emojis at <a
-                                            href="https://twemoji-cheatsheet.vercel.app/" target="_blank">Twemoji
-                                            Cheatsheet</a></p>
+                                        placeholder="https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/svg/1f951.svg"
+                                        style="margin-top:6px;">
                                 </div>
                             </div>
                             <div class="modal-footer">

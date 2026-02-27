@@ -111,6 +111,115 @@
 
             <div class="nav-actions" style="margin-top: 30px;">
                 <button class="nav-btn back-btn" data-back="step-calculator">Back to Calculator</button>
+                <button class="nav-btn next-btn" data-next="step-meal-planner">🍽️ Plan My Meals</button>
+            </div>
+        </section>
+
+        <!-- Step 4: Meal Planner -->
+        <section id="step-meal-planner" class="step-section hidden-step">
+            <div class="card calculator-card" style="max-width:850px;">
+                <h2>🍽️ Your Daily Meal Planner</h2>
+                <p>Build your meals to reach your daily calorie goal. Pick foods or use a quick preset!</p>
+
+                <div class="calorie-target-bar">
+                    <div class="target-info">
+                        <span>Goal: <strong id="mp-goal">0</strong> kcal</span>
+                        <span>Consumed: <strong id="mp-consumed">0</strong> kcal</span>
+                        <span id="mp-remaining-label">Remaining: <strong id="mp-remaining">0</strong> kcal</span>
+                    </div>
+                    <div class="progress-track">
+                        <div class="progress-fill" id="mp-progress"></div>
+                    </div>
+                </div>
+
+                <!-- Quick Auto-Fill Presets -->
+                <div class="auto-fill-section">
+                    <h3>⚡ Quick Fill</h3>
+                    <p class="section-hint">Auto-calculate a full day of meals using one food group:</p>
+                    <div class="auto-fill-btns">
+                        <button class="auto-btn veg-btn" id="auto-veg">🥬 All Vegetables</button>
+                        <button class="auto-btn fruit-btn" id="auto-fruit">🍎 All Fruits</button>
+                        <button class="auto-btn protein-btn" id="auto-protein">🍗 All Proteins</button>
+                        <button class="auto-btn mix-btn" id="auto-mix">🌈 Balanced Mix</button>
+                        <button class="auto-btn clear-btn" id="auto-clear">🗑️ Clear Plate</button>
+                    </div>
+                </div>
+
+                <!-- Meal Split: Breakfast / Lunch / Dinner -->
+                <div class="meal-split-section" id="meal-split-section">
+                    <h3>🕐 Meal Schedule</h3>
+                    <p class="section-hint">How to split your daily calories across meals:</p>
+                    <div class="meal-split-grid">
+                        <div class="meal-card breakfast">
+                            <div class="meal-icon">🌅</div>
+                            <h4>Breakfast</h4>
+                            <p class="meal-pct">30%</p>
+                            <p class="meal-kcal" id="split-breakfast">0 kcal</p>
+                            <div id="split-breakfast-foods" class="meal-foods"></div>
+                        </div>
+                        <div class="meal-card lunch">
+                            <div class="meal-icon">☀️</div>
+                            <h4>Lunch</h4>
+                            <p class="meal-pct">40%</p>
+                            <p class="meal-kcal" id="split-lunch">0 kcal</p>
+                            <div id="split-lunch-foods" class="meal-foods"></div>
+                        </div>
+                        <div class="meal-card dinner">
+                            <div class="meal-icon">🌙</div>
+                            <h4>Dinner</h4>
+                            <p class="meal-pct">30%</p>
+                            <p class="meal-kcal" id="split-dinner">0 kcal</p>
+                            <div id="split-dinner-foods" class="meal-foods"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Food Selector -->
+                <h3 style="margin-top:30px; color: var(--primary-color);">➕ Add Foods to Plate</h3>
+                <div class="mp-category-tabs">
+                    <button class="mp-tab active" data-mp-cat="all">All</button>
+                    <button class="mp-tab" data-mp-cat="vegetable">🥬 Vegetables</button>
+                    <button class="mp-tab" data-mp-cat="fruit">🍎 Fruits</button>
+                    <button class="mp-tab" data-mp-cat="meat">🍗 Proteins</button>
+                </div>
+
+                <div class="mp-food-selector" id="mp-food-selector">
+                    <!-- Food chips rendered by JS -->
+                </div>
+
+                <!-- Plate -->
+                <h3 style="margin-top:30px; color: var(--primary-color);">📋 Your Plate</h3>
+                <div id="mp-plate" class="mp-plate">
+                    <p class="mp-empty" id="mp-empty">Click ➕ on foods above to add them!</p>
+                </div>
+
+                <div id="mp-suggestion" class="mp-suggestion hidden"></div>
+
+                <!-- Meal Reminders -->
+                <div class="reminder-section" id="reminder-section">
+                    <h3>🔔 Meal Reminders</h3>
+                    <p class="section-hint">Set notification times — we'll remind you what to eat!</p>
+                    <div class="reminder-grid">
+                        <div class="reminder-row">
+                            <span class="reminder-label">🌅 Breakfast</span>
+                            <input type="time" id="remind-breakfast" value="08:00" class="reminder-time">
+                        </div>
+                        <div class="reminder-row">
+                            <span class="reminder-label">☀️ Lunch</span>
+                            <input type="time" id="remind-lunch" value="13:00" class="reminder-time">
+                        </div>
+                        <div class="reminder-row">
+                            <span class="reminder-label">🌙 Dinner</span>
+                            <input type="time" id="remind-dinner" value="19:00" class="reminder-time">
+                        </div>
+                    </div>
+                    <button class="btn-remind" id="btn-set-reminders">🔔 Enable Meal Reminders</button>
+                    <p class="reminder-status" id="reminder-status"></p>
+                </div>
+            </div>
+
+            <div class="nav-actions" style="margin-top: 30px;">
+                <button class="nav-btn back-btn" data-back="step-food">Back to Foods</button>
                 <button class="nav-btn home-btn" onclick="location.reload()">Start Over</button>
             </div>
         </section>

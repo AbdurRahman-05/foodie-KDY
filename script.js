@@ -149,16 +149,463 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
+        let dailyCalorieGoal = 0;
+
         calculateBtn.addEventListener('click', () => {
             const age = parseInt(ageInput.value);
             const gender = document.querySelector('input[name="gender"]:checked').value;
             if (!age || age < 1) { alert("Please enter a valid age."); return; }
             const calories = calculateDailyCalories(age, gender);
+            dailyCalorieGoal = calories;
             resultMessage.style.display = 'block';
             resultMessage.innerHTML = `Based on your age (${age}) and gender (${gender}), your estimated daily requirement is <strong>${calories} kcal</strong>.`;
             resultMessage.classList.remove('hidden');
             calcNextBtn.classList.remove('hidden');
         });
+
+        // =============== MEAL PLANNER ===============
+        const mpGoalEl = document.getElementById('mp-goal');
+        const mpConsumedEl = document.getElementById('mp-consumed');
+        const mpRemainingEl = document.getElementById('mp-remaining');
+        const mpProgressEl = document.getElementById('mp-progress');
+        const mpFoodSelector = document.getElementById('mp-food-selector');
+        const mpPlate = document.getElementById('mp-plate');
+        const mpSuggestion = document.getElementById('mp-suggestion');
+        const mpTabs = document.querySelectorAll('.mp-tab');
+        let mpCurrentCat = 'all';
+        let plate = []; // { id, name, image, caloriesPer100g, grams }
+
+        // Tab filtering
+        if (mpTabs) {
+            mpTabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    mpTabs.forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    mpCurrentCat = tab.dataset.mpCat;
+                    renderMpFoodSelector();
+                });
+            });
+        }
+
+        function renderMpFoodSelector() {
+            if (!mpFoodSelector) return;
+            mpFoodSelector.innerHTML = '';
+            const filtered = mpCurrentCat === 'all' ? foodData : foodData.filter(f => f.type === mpCurrentCat);
+
+            filtered.forEach(food => {
+                const chip = document.createElement('div');
+                chip.className = 'mp-food-chip';
+                chip.innerHTML = `
+                    <img src="${food.image}" alt="${food.name}">
+                    <span>${food.name}</span>
+                    <span class="chip-cal">${food.calories} kcal/${food.unit}</span>
+                    <button class="chip-add" title="Add to plate">+</button>
+                `;
+                // Click the + button to add
+                chip.querySelector('.chip-add').addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    addToPlate(food);
+                });
+                // Also allow clicking the whole chip
+                chip.addEventListener('click', () => addToPlate(food));
+                mpFoodSelector.appendChild(chip);
+            });
+        }
+
+        function addToPlate(food) {
+            const existing = plate.find(p => p.id === food.id);
+            if (existing) {
+                existing.grams += 100;
+            } else {
+                plate.push({
+                    id: food.id,
+                    name: food.name,
+                    image: food.image,
+                    caloriesPer100g: food.calories,
+                    unit: food.unit,
+                    grams: 100
+                });
+            }
+            renderPlate();
+        }
+
+        function removeFromPlate(foodId) {
+            plate = plate.filter(p => p.id !== foodId);
+            renderPlate();
+        }
+
+        function renderPlate() {
+            if (!mpPlate) return;
+            const goal = dailyCalorieGoal || 2000;
+            if (mpGoalEl) mpGoalEl.textContent = goal;
+
+            if (plate.length === 0) {
+                mpPlate.innerHTML = '<p class="mp-empty">Click ➕ on foods above to add them!</p>';
+                updateCalorieProgress(0);
+                updateMealSplit(0);
+                if (mpSuggestion) mpSuggestion.classList.add('hidden');
+                return;
+            }
+
+            mpPlate.innerHTML = '';
+            let totalCalories = 0;
+
+            plate.forEach(item => {
+                const itemCals = Math.round((item.caloriesPer100g / 100) * item.grams);
+                totalCalories += itemCals;
+
+                const row = document.createElement('div');
+                row.className = 'mp-plate-item';
+                row.innerHTML = `
+                    <img src="${item.image}" alt="${item.name}">
+                    <span class="plate-name">${item.name}</span>
+                    <div class="plate-qty">
+                        <input type="number" value="${item.grams}" min="10" step="10" data-id="${item.id}">
+                        <span>g</span>
+                    </div>
+                    <span class="plate-kcal">${itemCals} kcal</span>
+                    <button class="plate-remove" data-id="${item.id}">✕</button>
+                `;
+                mpPlate.appendChild(row);
+            });
+
+            // Quantity change handlers
+            mpPlate.querySelectorAll('input[type="number"]').forEach(input => {
+                input.addEventListener('input', () => {
+                    const id = parseInt(input.dataset.id);
+                    const item = plate.find(p => p.id === id);
+                    if (item) {
+                        item.grams = Math.max(0, parseInt(input.value) || 0);
+                        renderPlate();
+                    }
+                });
+            });
+
+            // Remove handlers
+            mpPlate.querySelectorAll('.plate-remove').forEach(btn => {
+                btn.addEventListener('click', () => removeFromPlate(parseInt(btn.dataset.id)));
+            });
+
+            updateCalorieProgress(totalCalories);
+            updateMealSplit(totalCalories);
+            generateSuggestion(totalCalories);
+        }
+
+        function updateCalorieProgress(consumed) {
+            if (!mpConsumedEl || !mpProgressEl) return;
+            const goal = dailyCalorieGoal || 2000;
+            const remaining = goal - consumed;
+
+            mpConsumedEl.textContent = consumed;
+
+            const remainLabel = document.getElementById('mp-remaining-label');
+            if (remainLabel) {
+                remainLabel.innerHTML = remaining >= 0
+                    ? `Remaining: <strong>${remaining}</strong> kcal`
+                    : `Over by: <strong style="color:#ef5350">${Math.abs(remaining)}</strong> kcal`;
+            }
+
+            const pct = Math.min((consumed / goal) * 100, 100);
+            mpProgressEl.style.width = pct + '%';
+            mpProgressEl.classList.toggle('over', consumed > goal);
+        }
+
+        // ---- MEAL SPLIT (Breakfast 30% / Lunch 40% / Dinner 30%) ----
+        function updateMealSplit(totalConsumed) {
+            const goal = dailyCalorieGoal || 2000;
+            const bfCal = Math.round(goal * 0.30);
+            const luCal = Math.round(goal * 0.40);
+            const diCal = Math.round(goal * 0.30);
+
+            const bfEl = document.getElementById('split-breakfast');
+            const luEl = document.getElementById('split-lunch');
+            const diEl = document.getElementById('split-dinner');
+            const bfFoods = document.getElementById('split-breakfast-foods');
+            const luFoods = document.getElementById('split-lunch-foods');
+            const diFoods = document.getElementById('split-dinner-foods');
+
+            if (bfEl) bfEl.textContent = bfCal + ' kcal';
+            if (luEl) luEl.textContent = luCal + ' kcal';
+            if (diEl) diEl.textContent = diCal + ' kcal';
+
+            // Distribute plate items across meals proportionally
+            if (plate.length === 0) {
+                if (bfFoods) bfFoods.innerHTML = '<em>No foods yet</em>';
+                if (luFoods) luFoods.innerHTML = '<em>No foods yet</em>';
+                if (diFoods) diFoods.innerHTML = '<em>No foods yet</em>';
+                return;
+            }
+
+            // Split plate items across meals: first items to breakfast, middle to lunch, rest to dinner
+            const mealItems = { breakfast: [], lunch: [], dinner: [] };
+            let runningCal = 0;
+
+            plate.forEach(item => {
+                const itemCals = Math.round((item.caloriesPer100g / 100) * item.grams);
+                if (runningCal < bfCal) {
+                    const available = bfCal - runningCal;
+                    if (itemCals <= available) {
+                        mealItems.breakfast.push({ name: item.name, grams: item.grams, kcal: itemCals });
+                        runningCal += itemCals;
+                    } else {
+                        // Split this item between breakfast and lunch
+                        const bfGrams = Math.round((available / item.caloriesPer100g) * 100);
+                        const remaining = item.grams - bfGrams;
+                        mealItems.breakfast.push({ name: item.name, grams: bfGrams, kcal: available });
+                        runningCal += available;
+                        const remCal = Math.round((item.caloriesPer100g / 100) * remaining);
+                        mealItems.lunch.push({ name: item.name, grams: remaining, kcal: remCal });
+                        runningCal += remCal;
+                    }
+                } else if (runningCal < bfCal + luCal) {
+                    const available = (bfCal + luCal) - runningCal;
+                    if (itemCals <= available) {
+                        mealItems.lunch.push({ name: item.name, grams: item.grams, kcal: itemCals });
+                        runningCal += itemCals;
+                    } else {
+                        const luGrams = Math.round((available / item.caloriesPer100g) * 100);
+                        const remaining = item.grams - luGrams;
+                        mealItems.lunch.push({ name: item.name, grams: luGrams, kcal: available });
+                        runningCal += available;
+                        const remCal = Math.round((item.caloriesPer100g / 100) * remaining);
+                        mealItems.dinner.push({ name: item.name, grams: remaining, kcal: remCal });
+                        runningCal += remCal;
+                    }
+                } else {
+                    mealItems.dinner.push({ name: item.name, grams: item.grams, kcal: itemCals });
+                    runningCal += itemCals;
+                }
+            });
+
+            // Render meal food lists
+            function renderMealFoods(container, items) {
+                if (!container) return;
+                if (items.length === 0) {
+                    container.innerHTML = '<em>—</em>';
+                    return;
+                }
+                container.innerHTML = items.map(i =>
+                    `<div class="meal-food-item"><span>${i.name}</span><span>${i.grams}g (${i.kcal} kcal)</span></div>`
+                ).join('');
+            }
+
+            renderMealFoods(bfFoods, mealItems.breakfast);
+            renderMealFoods(luFoods, mealItems.lunch);
+            renderMealFoods(diFoods, mealItems.dinner);
+        }
+
+        // ---- AUTO-FILL PRESETS ----
+        function autoFillByCategory(category) {
+            const goal = dailyCalorieGoal || 2000;
+            let foods;
+            if (category === 'mix') {
+                foods = [...foodData]; // all foods
+            } else {
+                foods = foodData.filter(f => f.type === category);
+            }
+            if (foods.length === 0) return;
+
+            plate = [];
+            const caloriesPerFood = Math.ceil(goal / foods.length);
+
+            foods.forEach(food => {
+                const gramsNeeded = Math.round((caloriesPerFood / food.calories) * 100);
+                plate.push({
+                    id: food.id,
+                    name: food.name,
+                    image: food.image,
+                    caloriesPer100g: food.calories,
+                    unit: food.unit,
+                    grams: Math.max(10, gramsNeeded)
+                });
+            });
+            renderPlate();
+        }
+
+        // Bind auto-fill buttons
+        const autoVeg = document.getElementById('auto-veg');
+        const autoFruit = document.getElementById('auto-fruit');
+        const autoProtein = document.getElementById('auto-protein');
+        const autoMix = document.getElementById('auto-mix');
+        const autoClear = document.getElementById('auto-clear');
+
+        if (autoVeg) autoVeg.addEventListener('click', () => autoFillByCategory('vegetable'));
+        if (autoFruit) autoFruit.addEventListener('click', () => autoFillByCategory('fruit'));
+        if (autoProtein) autoProtein.addEventListener('click', () => autoFillByCategory('meat'));
+        if (autoMix) autoMix.addEventListener('click', () => autoFillByCategory('mix'));
+        if (autoClear) autoClear.addEventListener('click', () => { plate = []; renderPlate(); });
+
+        function generateSuggestion(consumed) {
+            if (!mpSuggestion) return;
+            const goal = dailyCalorieGoal || 2000;
+            const remaining = goal - consumed;
+
+            if (remaining <= 0) {
+                mpSuggestion.classList.remove('hidden');
+                mpSuggestion.innerHTML = consumed === goal
+                    ? '🎉 <strong>Perfect!</strong> You\'ve reached your daily calorie goal exactly!'
+                    : '⚠️ You\'re <strong>' + Math.abs(remaining) + ' kcal over</strong> your daily goal. Consider reducing portions.';
+                return;
+            }
+
+            const plateIds = plate.map(p => p.id);
+            const unused = foodData.filter(f => !plateIds.includes(f.id));
+            let suggestions = [];
+
+            unused.slice(0, 3).forEach(food => {
+                const gramsNeeded = Math.round((remaining / food.calories) * 100);
+                if (gramsNeeded > 0) {
+                    suggestions.push(`<strong>${gramsNeeded}g</strong> of ${food.name}`);
+                }
+            });
+
+            plate.slice(0, 2).forEach(item => {
+                const extraGrams = Math.round((remaining / item.caloriesPer100g) * 100);
+                if (extraGrams > 0) {
+                    suggestions.push(`<strong>${extraGrams}g more</strong> of ${item.name}`);
+                }
+            });
+
+            if (suggestions.length > 0) {
+                mpSuggestion.classList.remove('hidden');
+                mpSuggestion.innerHTML = `💡 You still need <strong>${remaining} kcal</strong>. Try adding: ${suggestions.join(' or ')}.`;
+            } else {
+                mpSuggestion.classList.add('hidden');
+            }
+        }
+
+        // Observe section changes to init meal planner
+        const mpSection = document.getElementById('step-meal-planner');
+        if (mpSection) {
+            const observer = new MutationObserver(() => {
+                if (mpSection.classList.contains('active')) {
+                    if (mpGoalEl) mpGoalEl.textContent = dailyCalorieGoal || 2000;
+                    if (!dailyCalorieGoal) dailyCalorieGoal = 2000;
+                    renderMpFoodSelector();
+                    renderPlate();
+                }
+            });
+            observer.observe(mpSection, { attributes: true, attributeFilter: ['class'] });
+        }
+
+        renderMpFoodSelector();
+
+        // =============== MEAL REMINDERS (Browser Notifications) ===============
+        let remindersActive = false;
+        let reminderInterval = null;
+        const btnRemind = document.getElementById('btn-set-reminders');
+        const reminderStatus = document.getElementById('reminder-status');
+
+        // Get meal items for notification body
+        function getMealFoodsText(mealKey) {
+            const container = document.getElementById('split-' + mealKey + '-foods');
+            if (!container) return 'Your planned foods';
+            const items = container.querySelectorAll('.meal-food-item');
+            if (items.length === 0) return 'No foods planned yet';
+            let lines = [];
+            items.forEach(item => {
+                lines.push(item.textContent.trim());
+            });
+            return lines.join('\n');
+        }
+
+        function sendMealNotification(mealName, mealEmoji, mealKey) {
+            const kcalEl = document.getElementById('split-' + mealKey);
+            const kcal = kcalEl ? kcalEl.textContent : '';
+            const foods = getMealFoodsText(mealKey);
+
+            if ('Notification' in window && Notification.permission === 'granted') {
+                new Notification(mealEmoji + ' ' + mealName + ' Time!', {
+                    body: kcal + '\n' + foods,
+                    icon: 'https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/svg/1f37d.svg',
+                    tag: 'foodiekdy-' + mealKey,
+                    requireInteraction: true
+                });
+            }
+        }
+
+        // Track which notifications already fired today (avoid repeats)
+        let firedToday = {};
+
+        function checkAndFireReminders() {
+            const now = new Date();
+            const currentTime = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
+            const todayKey = now.toDateString();
+
+            // Reset fired tracker at midnight
+            if (firedToday._date !== todayKey) {
+                firedToday = { _date: todayKey };
+            }
+
+            const meals = [
+                { key: 'breakfast', name: 'Breakfast', emoji: '🌅', inputId: 'remind-breakfast' },
+                { key: 'lunch', name: 'Lunch', emoji: '☀️', inputId: 'remind-lunch' },
+                { key: 'dinner', name: 'Dinner', emoji: '🌙', inputId: 'remind-dinner' }
+            ];
+
+            meals.forEach(meal => {
+                const input = document.getElementById(meal.inputId);
+                if (!input) return;
+                const setTime = input.value; // "HH:MM"
+                if (currentTime === setTime && !firedToday[meal.key]) {
+                    firedToday[meal.key] = true;
+                    sendMealNotification(meal.name, meal.emoji, meal.key);
+                }
+            });
+        }
+
+        if (btnRemind) {
+            btnRemind.addEventListener('click', async () => {
+                if (remindersActive) {
+                    // Disable
+                    remindersActive = false;
+                    clearInterval(reminderInterval);
+                    reminderInterval = null;
+                    btnRemind.textContent = '🔔 Enable Meal Reminders';
+                    btnRemind.classList.remove('active');
+                    if (reminderStatus) reminderStatus.textContent = 'Reminders disabled.';
+                    return;
+                }
+
+                // Request notification permission
+                if (!('Notification' in window)) {
+                    if (reminderStatus) reminderStatus.textContent = '❌ Notifications are not supported in this browser.';
+                    return;
+                }
+
+                let perm = Notification.permission;
+                if (perm === 'default') {
+                    perm = await Notification.requestPermission();
+                }
+
+                if (perm !== 'granted') {
+                    if (reminderStatus) reminderStatus.textContent = '❌ Please allow notifications in your browser settings.';
+                    return;
+                }
+
+                // Enable reminders
+                remindersActive = true;
+                firedToday = { _date: new Date().toDateString() };
+                reminderInterval = setInterval(checkAndFireReminders, 30000); // check every 30 seconds
+                checkAndFireReminders(); // check immediately
+
+                btnRemind.textContent = '✅ Reminders Active — Click to Disable';
+                btnRemind.classList.add('active');
+
+                const bfTime = document.getElementById('remind-breakfast')?.value || '08:00';
+                const luTime = document.getElementById('remind-lunch')?.value || '13:00';
+                const diTime = document.getElementById('remind-dinner')?.value || '19:00';
+                if (reminderStatus) {
+                    reminderStatus.innerHTML = `🔔 Active! Breakfast at <strong>${bfTime}</strong>, Lunch at <strong>${luTime}</strong>, Dinner at <strong>${diTime}</strong>`;
+                }
+
+                // Test notification immediately
+                new Notification('🍽️ Foodie KDY Reminders Active!', {
+                    body: 'You\'ll be notified at meal times with your planned foods.',
+                    icon: 'https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/svg/1f514.svg'
+                });
+            });
+        }
 
         // =============== INTRO ANIMATION ===============
         playIntro(words);

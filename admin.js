@@ -281,9 +281,69 @@
     });
 
     const foodModal = $('#food-modal');
+    let uploadedBase64 = ''; // holds base64 from file upload
+
+    // ---- Image Upload Logic ----
+    const fileInput = $('#food-image-file');
+    const imagePreview = $('#image-preview');
+    const uploadPlaceholder = $('#upload-placeholder');
+    const uploadArea = $('#image-upload-area');
+
+    function showImagePreview(src) {
+        imagePreview.src = src;
+        imagePreview.classList.remove('hidden');
+        uploadPlaceholder.classList.add('hidden');
+    }
+
+    function resetImagePreview() {
+        imagePreview.src = '';
+        imagePreview.classList.add('hidden');
+        uploadPlaceholder.classList.remove('hidden');
+        uploadedBase64 = '';
+        fileInput.value = '';
+    }
+
+    function processImageFile(file) {
+        if (!file || !file.type.startsWith('image/')) return;
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            // Resize to max 200px to keep Firebase data small
+            const img = new Image();
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                const MAX = 200;
+                let w = img.width, h = img.height;
+                if (w > MAX || h > MAX) {
+                    if (w > h) { h = Math.round(h * MAX / w); w = MAX; }
+                    else { w = Math.round(w * MAX / h); h = MAX; }
+                }
+                canvas.width = w;
+                canvas.height = h;
+                canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+                uploadedBase64 = canvas.toDataURL('image/webp', 0.8);
+                showImagePreview(uploadedBase64);
+            };
+            img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+    }
+
+    fileInput.addEventListener('change', (e) => {
+        processImageFile(e.target.files[0]);
+    });
+
+    // Drag and drop
+    uploadArea.addEventListener('dragover', (e) => { e.preventDefault(); uploadArea.classList.add('dragover'); });
+    uploadArea.addEventListener('dragleave', () => uploadArea.classList.remove('dragover'));
+    uploadArea.addEventListener('drop', (e) => {
+        e.preventDefault();
+        uploadArea.classList.remove('dragover');
+        processImageFile(e.dataTransfer.files[0]);
+    });
 
     function openFoodModal(foodId = null) {
         editingFoodId = foodId;
+        resetImagePreview();
 
         if (foodId) {
             const food = get('foodData').find(f => f.id === foodId);
@@ -294,7 +354,8 @@
             $('#food-calories').value = food.calories;
             $('#food-unit').value = food.unit;
             $('#food-desc').value = food.description;
-            $('#food-image').value = food.image;
+            $('#food-image').value = food.image.startsWith('data:') ? '' : food.image;
+            if (food.image) showImagePreview(food.image);
         } else {
             $('#modal-title').textContent = 'Add New Food';
             $('#food-name').value = '';
@@ -310,6 +371,7 @@
     function closeFoodModal() {
         foodModal.classList.add('hidden');
         editingFoodId = null;
+        resetImagePreview();
     }
 
     $('#add-food-btn').addEventListener('click', () => openFoodModal());
@@ -323,7 +385,7 @@
         const calories = parseInt($('#food-calories').value);
         const unit = $('#food-unit').value.trim();
         const description = $('#food-desc').value.trim();
-        const image = $('#food-image').value.trim();
+        const image = uploadedBase64 || $('#food-image').value.trim();
 
         if (!name || !calories || !unit) {
             alert('Please fill in at least the name, calories, and unit fields.');
